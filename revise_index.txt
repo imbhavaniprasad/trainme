@@ -1,0 +1,118 @@
+const express = require("express");
+const fileUpload = require("express-fileupload");
+const pdfParse = require("pdf-parse");
+const cors = require('cors');
+// const dotenv = require('dotenv');
+const app = express();
+const { FaissStore } = require("langchain/vectorstores/faiss");
+const { OpenAIEmbeddings } = require("langchain/embeddings/openai");
+const { PDFLoader } =  require("langchain/document_loaders/fs/pdf");
+const { RecursiveCharacterTextSplitter,CharacterTextSplitter } = require("langchain/text_splitter");
+const { HuggingFaceInferenceEmbeddings } = require("langchain/embeddings/hf");
+const { MemoryVectorStore } = require("langchain/vectorstores/memory");
+// const { Configuration, OpenAIApi } =require("openai");
+const { OpenAI } = require("langchain/llms/openai");
+const { loadQAStuffChain } = require("langchain/chains");
+import { PineconeClient } from '@pinecone-database/pinecone';
+
+
+require('dotenv').config();
+app.use(cors({
+    origin: '*'
+}));
+const client = new clientClient();
+await client.init({
+    apiKey: "61d6e20f-fc19-41cc-af92-c59bd8cd8ea0",
+    environment: "us-west1-gcp-free",
+});
+const indexName = "revise_docs";
+const vectorDimension = 1536;
+(async()=>{
+  await createPineConeIndex(client,indexName,vectorDimension);
+
+  await updatePineCone(client,indexName,docs);
+
+  await queryPineConeVectorStore(client,indexName,question);
+})
+app.get('/', (req, res) => {   
+    res.status(200).json("Hii");
+})
+app.use(fileUpload());
+
+// const configuration = new Configuration({
+//   organization:'org-xjSP8G9wowfoHp3IxnV4sOVw',
+//     apiKey: process.env.OPENAI_API_KEY,
+// });
+// const openai = new OpenAIApi(configuration);
+app.post("/extract-text", async (req, res) => {
+    // console.log("im called",req.files)
+    if (!req.files && !req.files.pdfFile) {
+        res.status(400);
+        res.end();
+    }
+let rawDocs=null;
+    await pdfParse(req.files.pdfFile).then(result => {
+        // res.send(result.text);
+        rawDocs = result.text;
+    });
+    // console.log(rawDocs);
+
+
+// const loader = new PDFLoader("./car_drivers.pdf");
+// const text = "foo bar baz 123";
+// const splitter = new CharacterTextSplitter({
+//   separator: " ",
+//   chunkSize: 7,
+//   chunkOverlap: 3,
+// });
+
+// const docs = await loader.load();
+
+        // console.log("raw docs",output);
+        const splitter = new RecursiveCharacterTextSplitter({
+            chunkSize: 1000,
+            chunkOverlap: 200,
+          });
+          
+          const output = await splitter.createDocuments([rawDocs]);
+    
+        
+          const embeddings = new HuggingFaceInferenceEmbeddings({
+            model_name : "hkunlp/instructor-xl",
+            apiKey: "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",
+          });
+          // const 
+          // const embeddings = new OpenAIEmbeddings({
+          //   openAIApiKey: "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", // In Node.js defaults to process.env.OPENAI_API_KEY
+          // });
+          const vectorStore = await MemoryVectorStore.fromDocuments(
+            output,
+           embeddings
+          );
+          console.log("vector store",vectorStore.memoryVectors);
+    // const retriever = vectorStore.asRetriever();
+          const resultOne = await vectorStore.similaritySearch("List down 3 questions I can ask from this pdf", 1);
+          const llmA = new OpenAI();
+const chainA = loadQAStuffChain(llmA);
+console.log("similar search",resultOne);
+const resA = await chainA.call({
+  input_documents: resultOne,
+  question: "List down 3 questions I can ask from this pdf",
+});
+console.log({ resA });
+
+res.status(200).send(resA);
+//          const embed = await openai.createEmbedding({
+//             model:"text-embedding-ada-002",
+//             input:'Hi there How are you'
+// })
+// const response = embed.data.data;
+          // console.log("vec",embed);
+       
+          // res.send(response);
+          
+});
+
+app.listen(5000,()=>{
+    console.log("Listening at port 5000")
+});

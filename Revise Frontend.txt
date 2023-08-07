@@ -1,0 +1,26 @@
+Front End :
+---------------
+UI : 
+Top Right : User Name, Dark Toggle;
+Side Bar : widget => Uploaded Files as Names & New File Option;
+Center : 
+1)Onclicking new file or on Open : Upload a File with File Name input box
+2) After UPLOADING FILE or On clicking the file : Attempt a test or Chat?
+Footer : 
+After file is selected for a chat : Input box & the question & answer format;
+Attempt a test : Ask Questions with Timer => Results; Retry / Reset Q's;
+---
+Steps 
+1) On opening, ask user to upload file
+2)After uploading it, display the title on left side
+  Create an Index, name space that identifies the file & do embeddings...
+3)Now ask Attempt a test or Chat?
+4) query with namesapace & return results;
+ chat : do it;
+ test : start with 5 choices Qs & show performace;
+---------
+  '1. What is semiotics?\n' +
+      '2. What is literary interpretation?\n' +
+      '3. What is the plot of The Name of the Rose?\n' +
+      '4. What are some of the flaws of the world of filmmaking today?\n' +
+      '5. To what extent are an individual’s achievements dependent on the kind of influences he or she has had in life?' 
