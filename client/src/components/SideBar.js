@@ -1,4 +1,8 @@
 import React from 'react'
+import "../App.css"
+import { FileContext } from '../App';
+import { useContext } from 'react';
+
 const SideBar = ({setCurrentFile,currentFile,previousFiles,handleFileSelection,createNewChat}) => {
   // console.log("sidbar",currentFile);
   // console.log("prev files",previousFiles);

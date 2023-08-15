@@ -1,12 +1,22 @@
 import "./App.css";
-import {useEffect, useState} from 'react'
+import {useEffect, useState,createContext} from 'react'
 import SideBar from "./components/SideBar";
 import UploadFile from "./components/UploadFile";
+import MainPage from "./components/MainPage";
+import { BrowserRouter as Router, Route, Routes,Link } from 'react-router-dom'
+import AttemptTest from "./components/AttemptTest";
+import { useNavigate } from 'react-router-dom';
+export const FileContext = createContext(undefined);
 function App() {
   const [docs,setDocs] = useState(null);
   const [loading,setLoading]=useState(false);
-  const [previousFiles,setPreviousFiles]=useState([]);
+  const [previousFiles,setPreviousFiles]=useState([
+    {"title":"Car Drivers","nameSpace":"car-driving-rules5061fd70-a53e-4b66-bcca-87e3f60f104e"},
+    {"title":"IngMar","nameSpace":"ingmar-bergmandc97c212-5cc7-44eb-9e81-8931eb7694ec"},
+
+  ]);
   const [currentFile,setCurrentFile]=useState(null);
+  const navigate = useNavigate();
   // useEffect(()=>{
   //   console.log("file being uploaded");
   //    if(!currentFile && docs){
@@ -21,6 +31,7 @@ function App() {
   // },[docs?.nameSpace]);
   const handleFileSelection = (file)=>{
     setCurrentFile(file);
+    navigate("/");
   }
   const createNewChat=()=>{
     console.log("new chat")
@@ -35,19 +46,14 @@ function App() {
   console.log("previous files",previousFiles);
   return (
     <div className="app">
+      <FileContext.Provider value={currentFile}>
       <SideBar setCurrentFile={setCurrentFile} createNewChat={createNewChat} currentFile={currentFile} previousFiles={previousFiles} handleFileSelection={handleFileSelection}/>
-
-      {!currentFile &&
-      <UploadFile loading={loading} setLoading={setLoading} handleUpload={handleUpload}/>
-      }
-      {currentFile &&
-      <div className="action-buttons">
-        <div className="buttons-container">
-           <button className="active">Attempt a Test</button>
-           <button>Chat with File</button>
-        </div>
-        </div>
-      }
+        <Routes>
+        <Route exact path="/" element={<MainPage loading={loading} setLoading={setLoading} handleUpload={handleUpload} currentFile={currentFile}/>}>
+        </Route>
+        <Route path="/test" element={<AttemptTest/>}></Route>
+        </Routes>
+        </FileContext.Provider>
     </div>
   );
 }

@@ -69,7 +69,7 @@ nav{
         width: 100%;
         max-width: 650px;
     }
-    /* input{
+    .chat-input{
         width: 100%;
         border: none;
         font-size: 20px;
@@ -77,9 +77,9 @@ nav{
         padding: 12px 15px;
         border-radius: 5px;
     }
-    input:focus{
+    .chat-input:focus{
         outline : none;
-    } */
+    }
     #submit{
         position: absolute;
         bottom: 15px;
@@ -90,22 +90,24 @@ nav{
         overflow: auto;
         width: 100%;
         padding: 0;
+        height: 100%;
     }
     .feed li {
         display: flex;
         background-color: #444654;
         width: 100%;
-        padding: 20px;
-        margin: 20px 0; 
+        padding: 10px;
+        margin: 10px 0; 
     }
     .feed p{
         color: rgba(255,255,255,0.8);
         font-size: 14px;
         text-align: left;
+        margin-left: 60px;
     }
-    .feed p.role{
+    /* .feed p.role{
         min-width: 100px;
-    }
+    } */
     /*Upload File */
 .file-upload {
     width: 100%;
