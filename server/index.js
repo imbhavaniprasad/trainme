@@ -85,7 +85,7 @@ app.post("/get-answer",async(req,res)=>{
         // const nameSpaceName = req.files.pdfFile.name.split(".")[0].replace(/_/g, '-');
         // console.log("req.body",req.body)
         //   await createPineConeIndex(client,indexName,vectorDimension);
-        const answer = await queryPineConeVectorStore(client,"car-driving-rulesdd036594-3035-4b66-a9b7-187a2c4e062f",req.body.question);
+        const answer = await queryPineConeVectorStore(client,req.body.nameSpace,req.body.question);
         res.status(200).json({answer :answer});
 
     }
