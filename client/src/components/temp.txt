@@ -1,0 +1,93 @@
+import React, { useState } from 'react'
+import { FileContext } from '../App';
+import { useContext } from 'react';
+import { test as questionsArray } from './test';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+const AttemptTest = () => {
+  const currentFile = useContext(FileContext);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [score, setScore] = useState(0);
+  const navigate = useNavigate();
+  const handleOptionChange = (option) => {
+    setSelectedOption(option);
+  };
+
+  const handleNextQuestion = () => {
+    if (selectedOption !== null) {
+      if (questionsArray[currentQuestionIndex].answer === selectedOption) {
+        setScore(score + 1);
+      }
+      setSelectedOption(null);
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+  const handleReset = () => {
+    setCurrentQuestionIndex(0);
+    setSelectedOption(null);
+    setScore(0);
+  }
+  const renderOptions = () => {
+    const question = questionsArray[currentQuestionIndex];
+    const options = ['a', 'b', 'c', 'd'];
+    const optionRows = [];
+    for (let i = 0; i < options.length; i += 2) {
+      const optionRow = (
+        <div key={i} style={{ display: 'flex', justifyContent: "space-between", width: '70%', 'margin': '10px auto' }}>
+          <label style={{ textAlign: 'left' }}>
+            <input
+              type="radio"
+              name="option"
+              value={options[i]}
+              checked={selectedOption === options[i]}
+              onChange={() => handleOptionChange(options[i])}
+            />
+            {question[options[i]]}
+          </label >
+          {i + 1 < options.length && (
+            <label style={{ textAlign: 'left' }}>
+              <input
+                type="radio"
+                name="option"
+                value={options[i + 1]}
+                checked={selectedOption === options[i + 1]}
+                onChange={() => handleOptionChange(options[i + 1])}
+              />
+              {question[options[i + 1]]}
+            </label>
+          )}
+        </div>
+      );
+      optionRows.push(optionRow);
+    }
+    return optionRows;
+  };
+  return (
+    <div className="test_main">
+      {currentQuestionIndex < questionsArray.length ? (
+        <div>
+          <h1 style={{ textAlign: 'left' }}>Question {currentQuestionIndex + 1}</h1>
+          <div style={{ textAlign: 'center' }}>
+            <h2>{questionsArray[currentQuestionIndex].question}</h2>
+            <form>{renderOptions()}</form>
+            <button style={{ color: 'white', backgroundColor: 'blue', border: '1px solid white', width: '100px', padding: '8px', fontSize: '15px' }} onClick={handleNextQuestion}>Next</button>
+          </div>
+
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center' }}>
+          <h1>Quiz Completed</h1>
+          <p>Your score: {score} / {questionsArray.length}</p>
+          <button onClick={handleReset} style={{ color: 'white', backgroundColor: 'green', border: '1px solid white', width: '100px', padding: '8px', fontSize: '20px' }}>Reset</button>
+        </div>
+      )}
+      <hr />
+      {currentQuestionIndex < questionsArray.length && <div className="bottom-section">
+        <button onClick={handleReset} style={{ color: 'white', backgroundColor: 'green', border: '1px solid white', minWidth: '100px', padding: '8px', fontSize: '20px' }}>Randomize</button>
+      </div>}
+    </div>
+  )
+}
+
+export default AttemptTest
